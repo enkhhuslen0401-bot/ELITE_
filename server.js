@@ -1,33 +1,6 @@
-function getStepLogger(manager) {
-    try {
-        if (manager && typeof manager.getLogger === "function") {
-            return manager.getLogger();
-        }
-    }
-    catch (_error) {
-        // Ignore and fall back to console logger.
-    }
-    return {
-        info: function (message) { if (typeof console !== "undefined" && console.log) { console.log(message); } },
-        warn: function (message) { if (typeof console !== "undefined" && console.warn) { console.warn(message); } },
-        error: function (message) { if (typeof console !== "undefined" && console.error) { console.error(message); } },
-        severe: function (message) { if (typeof console !== "undefined" && console.error) { console.error(message); } }
-    };
-}
-
-/**
- * STEP Business Rule
- * Trademark: AI Labz Ltd (TM)
- * Purpose: Describe the rule intent and expected side effects.
- * Notes: Keep transactions short and avoid repeated writes in loops.
- *
- * @param {JavaUtilLoggingLogger} log - Alias for logger, provided by STEP.
- * @returns {void} Top-level business rule scripts do not return a value - effects are applied directly via node/manager writes.
- */
-
 /**
  * ============================================================================
- * 🚀 ELITE CLAN PORTAL - ENTERPRISE BACKEND SERVER v5.3
+ * 🚀 ELITE CLAN PORTAL - ENTERPRISE BACKEND SERVER v5.3 (OPTIMIZED)
  * ============================================================================
  */
 
@@ -37,15 +10,16 @@ const path = require('path');
 class EliteBackendEnterpriseServer {
     constructor() {
         this.app = express();
+        // Render болон бусад клүүд дээр динамик портыг автоматаар авах тохиргоо
         this.port = process.env.PORT || 3000;
 
         this.config = {
             appName: "ELITE CLAN PORTAL",
-            version: "5.3.0-PROD",
-            discordWebhookUrl: 'https://discord.com/api/webhooks/1568511718768902385/WPMLa1YZjv_ZoCT068XeuEnryHX0A0ZCOaP-jdLbHQfrpomAXBZxG-E8igKgFXsdewsD',
-            novacsApiKey: 'NVCS-45A1C1439811CBFE5808BC853F80613FE75D5F61',
+            version: "5.3.1-PROD",
+            discordWebhookUrl: process.env.DISCORD_WEBHOOK_URL || 'https://discord.com/api/webhooks/1568511718768902385/WPMLa1YZjv_ZoCT068XeuEnryHX0A0ZCOaP-jdLbHQfrpomAXBZxG-E8igKgFXsdewsD',
+            novacsApiKey: process.env.NOVACS_API_KEY || 'NVCS-45A1C1439811CBFE5808BC853F80613FE75D5F61',
             novacsBaseEndpoint: 'https://novacs.cc/api/v1/player/summary',
-            steamApiKey: 'CBAA2149141064924A2EE0FEB60ADBFE',
+            steamApiKey: process.env.STEAM_API_KEY || 'CBAA2149141064924A2EE0FEB60ADBFE',
             steamOpenIdEndpoint: 'https://steamcommunity.com/openid/login',
             cacheTtlMs: 300000,
             apiTimeoutMs: 3000
@@ -54,7 +28,6 @@ class EliteBackendEnterpriseServer {
         this.database = {
             applications: [],
             auditLogs: [],
-            // БҮХ ГИШҮҮД ҮНДСЭН БАГТ БОЛОН ЗАРИМ НЬ STREAMER/CC ДАВХАР БАЙХ ЖАГСААЛТ
             clanMembers: [
                 { name: "anclous", role: "ГИШҮҮН MVP / DEVELOPER", category: "main", steamId: "76561199860386528" },
                 { name: "kaquya", role: "ГИШҮҮН", category: "main", steamId: "76561198000000002" },
@@ -81,6 +54,7 @@ class EliteBackendEnterpriseServer {
     configureMiddleware() {
         this.app.use(express.json({ limit: '20mb' }));
         this.app.use(express.urlencoded({ extended: true, limit: '20mb' }));
+        // Статик файлуудыг public хавтсаас үйлчлэх
         this.app.use(express.static(path.join(__dirname, 'public')));
     }
 
@@ -96,7 +70,12 @@ class EliteBackendEnterpriseServer {
     }
 
     registerRoutes() {
-        // КЛАНЫ ГИШҮҮД НЭМЭХ API (Админ самбараас гишүүн шууд бүртгэх)
+        // Үндсэн нүүр хуудасны чиглүүлэлт (Cannot GET / алдаанаас сэргийлэх)
+        this.app.get('/', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public', 'index.html'));
+        });
+
+        // КЛАНЫ ГИШҮҮД НЭМЭХ API
         this.app.post('/api/admin/add-member', (req, res) => {
             const { name, role, category, steamId } = req.body;
             if (!name || !steamId) {
@@ -104,7 +83,7 @@ class EliteBackendEnterpriseServer {
             }
             const newMember = { name, role: role || 'ГИШҮҮН', category: category || 'main', steamId };
             this.database.clanMembers.push(newMember);
-            this.cache.rosterData = null; // Cache цэвэрлэх
+            this.cache.rosterData = null;
             res.status(200).json({ success: true, message: 'Гишүүн амжилттай нэмэгдлээ!', roster: this.database.clanMembers });
         });
 
@@ -120,16 +99,13 @@ class EliteBackendEnterpriseServer {
                     });
                 }
 
-                const rosterPromises = this.database.clanMembers.map(async (member) => {
-                    return {
-                        name: member.name,
-                        role: member.role,
-                        category: member.category,
-                        steamId: member.steamId
-                    };
-                });
+                const synchronizedRoster = this.database.clanMembers.map((member) => ({
+                    name: member.name,
+                    role: member.role,
+                    category: member.category,
+                    steamId: member.steamId
+                }));
 
-                const synchronizedRoster = await Promise.all(rosterPromises);
                 this.cache.rosterData = synchronizedRoster;
                 this.cache.lastFetchTimestamp = now;
 
@@ -139,7 +115,6 @@ class EliteBackendEnterpriseServer {
                     total: synchronizedRoster.length,
                     roster: synchronizedRoster
                 });
-
             } catch (error) {
                 res.status(500).json({ success: false, message: 'Дата татахад серверийн алдаа гарлаа.' });
             }
@@ -183,7 +158,6 @@ class EliteBackendEnterpriseServer {
                     return res.status(400).json({ success: false, message: 'Талбаруудыг бүрэн бөглөнө үү.' });
                 }
 
-                // 5k-20k хооронд санамсаргүй бонус бодох болон Novacs Clan Slot хүсэлтийн код үүсгэх
                 const bonusPoints = Math.floor(Math.random() * (20000 - 5000 + 1)) + 5000;
                 const clanSlotCode = `NOVACS-SLOT-${Math.floor(100000 + Math.random() * 900000)}`;
 
@@ -244,9 +218,10 @@ class EliteBackendEnterpriseServer {
     }
 
     start() {
-        this.app.listen(this.port, () => {
+        // Render дээр 0.0.0.0 хаяг болон динамик портоор сонсох тохиргоо
+        this.app.listen(this.port, '0.0.0.0', () => {
             console.log(`============================================================`);
-            console.log(`🚀 ELITE BACKEND SERVER RUNNING ON http://localhost:${this.port}`);
+            console.log(`🚀 ELITE BACKEND SERVER RUNNING ON PORT ${this.port}`);
             console.log(`🛡️ Novacs & Steam Integration: READY`);
             console.log(`============================================================`);
         });
