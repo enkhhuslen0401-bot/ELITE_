@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELITE CLAN — Ultimate CS2 Esports Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff2a5f;
+            --primary-glow: rgba(255, 42, 95, 0.6);
+            --bg-dark: #0a0b10;
+            --bg-card: rgba(16, 18, 27, 0.85);
+            --text-main: #ffffff;
+            --text-muted: #8b9bb4;
+            --discord-color: #5865F2;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Rajdhani', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); overflow-x: hidden; min-height: 100vh; }
+        
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 5%; background: rgba(10, 11, 16, 0.95);
+            border-bottom: 1px solid rgba(255, 42, 95, 0.3); position: sticky; top: 0; z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        .logo { font-family: 'Teko', sans-serif; font-size: 2.6rem; font-weight: 700; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
+        .logo span { color: var(--primary); text-shadow: 0 0 15px var(--primary-glow); }
+        
+        nav { display: flex; gap: 20px; align-items: center; }
+        nav a { color: var(--text-main); text-decoration: none; font-size: 1.1rem; font-weight: 600; transition: 0.3s; cursor: pointer; }
+        nav a:hover { color: var(--primary); text-shadow: 0 0 10px var(--primary-glow); }
+        
+        .discord-btn {
+            background: var(--discord-color); color: #fff; border: none; padding: 8px 16px; border-radius: 8px;
+            font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; text-decoration: none; transition: 0.3s;
+        }
+        .discord-btn:hover { box-shadow: 0 0 15px rgba(88, 101, 242, 0.8); transform: translateY(-2px); }
+
+        .steam-login-btn {
+            background: linear-gradient(135deg, #171a21 0%, #2a475e 100%); color: #fff; border: 1px solid #00c8f4;
+            padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; text-decoration: none; transition: 0.3s;
+        }
+        .steam-login-btn:hover { background: #66c0f4; color: #000; box-shadow: 0 0 15px rgba(102, 192, 244, 0.8); transform: translateY(-2px); }
+
+        .user-logged-in {
+            background: rgba(255, 42, 95, 0.2); border: 1px solid var(--primary); padding: 6px 14px;
+            border-radius: 8px; color: #fff; font-weight: 700; display: flex; align-items: center; gap: 10px; font-size: 0.95rem;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+        .logout-btn { background: #ff2a5f; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .logout-btn:hover { background: #ff003c; }
+
+        .container { max-width: 1200px; margin: 2.5rem auto; padding: 0 2rem; }
+        .section-title {
+            font-family: 'Teko', sans-serif; font-size: 2.4rem; text-transform: uppercase; margin-bottom: 1.5rem;
+            border-left: 4px solid var(--primary); padding-left: 12px; letter-spacing: 1px;
+        }
+
+        .roster-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-bottom: 3rem; }
+        .member-card {
+            background: var(--bg-card); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px;
+            padding: 20px; text-align: center; position: relative; overflow: hidden; transition: 0.3s;
+        }
+        .member-card:hover { border-color: var(--primary); box-shadow: 0 0 20px var(--primary-glow); transform: translateY(-5px); }
+        .member-name { font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 5px; }
+        .member-role { font-size: 0.95rem; color: var(--primary); font-weight: 600; text-transform: uppercase; margin-bottom: 15px; }
+
+        .form-container {
+            background: var(--bg-card); border: 1px solid rgba(255, 42, 95, 0.3); border-radius: 12px; padding: 30px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5); max-width: 700px; margin: 0 auto 3rem auto;
+        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-muted); text-transform: uppercase; font-size: 0.9rem; }
+        .form-control {
+            width: 100%; padding: 12px 16px; background: rgba(10, 11, 16, 0.8); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; color: #fff; font-size: 1rem; transition: 0.3s;
+        }
+        .form-control:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 10px var(--primary-glow); }
+        
+        .submit-btn {
+            background: var(--primary); color: #fff; border: none; padding: 14px; width: 100%; border-radius: 8px;
+            font-family: 'Teko', sans-serif; font-size: 1.5rem; letter-spacing: 1px; font-weight: bold; cursor: pointer; transition: 0.3s;
+            text-transform: uppercase; box-shadow: 0 0 15px var(--primary-glow);
+        }
+        .submit-btn:hover { background: #ff003c; box-shadow: 0 0 25px var(--primary); }
+
+        .admin-panel {
+            background: rgba(20, 10, 15, 0.95); border: 2px dashed var(--primary); border-radius: 12px; padding: 25px; margin-top: 3rem; display: none;
+        }
+        .admin-panel h3 { font-family: 'Teko', sans-serif; font-size: 2rem; color: var(--primary); margin-bottom: 15px; }
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .admin-table th, .admin-table td { padding: 10px; border: 1px solid rgba(255,255,255,0.1); text-align: left; font-size: 0.95rem; }
+        .admin-table th { background: rgba(255, 42, 95, 0.2); color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">ELITE <span>CLAN</span></div>
+        <nav>
+            <a href="#roster">Бүрэлдэхүүн</a>
+            <a href="#apply">Анкет</a>
+            <a href="https://discord.gg/WemZeSn3K" target="_blank" class="discord-btn"><i class="fa-brands fa-discord"></i> Discord</a>
+            <div id="auth-container">
+                <a href="/api/auth/steam" class="steam-login-btn"><i class="fa-brands fa-steam"></i> Steam Нэвтрэх</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- БҮРЭЛДЭХҮҮН ХЭСЭГ -->
+        <h2 class="section-title" id="roster">Үндсэн Бүрэлдэхүүн (Main Roster)</h2>
+        <div class="roster-grid" id="main-roster-grid">
+            <div class="member-card"><div class="member-name">Дата ачаалж байна...</div></div>
+        </div>
+
+        <h2 class="section-title">Content Creators (CC)</h2>
+        <div class="roster-grid" id="cc-roster-grid">
+            <div class="member-card"><div class="member-name">Дата ачаалж байна...</div></div>
+        </div>
+
+        <!-- АНКЕТ БӨГЛӨХ ХЭСЭГ -->
+        <h2 class="section-title" id="apply">Кланд Элсэх Анкет & Novacs Слот</h2>
+        <div class="form-container">
+            <form id="apply-form">
+                <div class="form-group">
+                    <label>Discord Tag</label>
+                    <input type="text" id="discordTag" class="form-control" placeholder="Жишээ нь: anclous" required>
+                </div>
+                <div class="form-group">
+                    <label>Элсэх Баг</label>
+                    <select id="category" class="form-control">
+                        <option value="main">Үндсэн баг (Main Roster)</option>
+                        <option value="streamer">Content Creator / Streamer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Нас / Хүйс</label>
+                    <input type="text" id="ageGender" class="form-control" placeholder="Жишээ нь: 18 / Эрэгтэй" required>
+                </div>
+                <div class="form-group">
+                    <label>CS2 Тоглосон цаг</label>
+                    <input type="text" id="hours" class="form-control" placeholder="Жишээ нь: 2,500 цаг">
+                </div>
+                <div class="form-group">
+                    <label>FACEIT Level</label>
+                    <input type="text" id="faceit" class="form-control" placeholder="Жишээ нь: Level 8">
+                </div>
+                <div class="form-group">
+                    <label>Premier ELO</label>
+                    <input type="text" id="premier" class="form-control" placeholder="Жишээ нь: 18,500 ELO">
+                </div>
+                <div class="form-group">
+                    <label>Novacs Rank</label>
+                    <input type="text" id="novaRank" class="form-control" placeholder="Жишээ нь: Elite Master">
+                </div>
+                <div class="form-group">
+                    <label>Өмнө нь байсан кланууд</label>
+                    <input type="text" id="prevClans" class="form-control" placeholder="Байхгүй бол хоосон үлдээ">
+                </div>
+                <div class="form-group">
+                    <label>Яагаад манай кланд элсэх болов?</label>
+                    <textarea id="reason" class="form-control" rows="4" placeholder="Өөрийнхөө тухай товч бичнэ үү..." required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Анкет илгээх & Novacs Слот авах</button>
+            </form>
+        </div>
+
+        <!-- АДМИН УДИРДЛАГЫН САМБАР (Зөвхөн Developer anclous-т харагдана) -->
+        <div class="admin-panel" id="admin-panel">
+            <h3>⚙️ АДМИН УДИРДЛАГЫН САМБАР (DEV CONTROL)</h3>
+            <div style="margin-bottom: 20px;">
+                <h4 style="color:#fff; margin-bottom: 10px;">➕ Шинэ гишүүн нэмэх</h4>
+                <input type="text" id="newMemberName" class="form-control" placeholder="Тоглогчийн нэр" style="margin-bottom: 10px;">
+                <input type="text" id="newMemberRole" class="form-control" placeholder="Албан тушаал (Жишээ: ГИШҮҮН)" style="margin-bottom: 10px;">
+                <input type="text" id="newMemberSteamId" class="form-control" placeholder="Steam ID (Жишээ: 76561199860386528)" style="margin-bottom: 10px;">
+                <button onclick="addNewMember()" class="submit-btn" style="padding: 10px; font-size: 1.2rem;">Гишүүн нэмэх</button>
+            </div>
+            <h4 style="color:#fff; margin-bottom: 10px;">📥 Ирсэн Анкетууд & Novacs Слот Хүсэлтүүд</h4>
+            <div id="admin-applications-list" style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Discord</th>
+                            <th>Steam</th>
+                            <th>Баг</th>
+                            <th>FACEIT/Premier</th>
+                            <th>Novacs Слот Код</th>
+                            <th>Бонус XP</th>
+                            <th>Шалтгаан</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-table-body">
+                        <tr><td colspan="7">Анкет одоогоор алга байна.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Steam Login & Logout шалгах логик
+        const urlParams = new URLSearchParams(window.location.search);
+        const steamId = urlParams.get('steamid');
+        const steamName = urlParams.get('name');
+        const authContainer = document.getElementById('auth-container');
+        const adminPanel = document.getElementById('admin-panel');
+
+        if (steamId) {
+            localStorage.setItem('elite_steam_id', steamId);
+            localStorage.setItem('elite_steam_name', steamName || 'User');
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        const savedSteamId = localStorage.getItem('elite_steam_id');
+        const savedSteamName = localStorage.getItem('elite_steam_name');
+
+        if (savedSteamId) {
+            authContainer.innerHTML = `
+                <div class="user-logged-in">
+                    <span>🟢 ${savedSteamName}</span>
+                    <button class="logout-btn" onclick="logoutSteam()">Гарах</button>
+                </div>
+            `;
+            // Admin Check: Developer anclous (Steam ID: 76561199860386528)
+            if (savedSteamId === '76561199860386528') {
+                adminPanel.style.display = 'block';
+                loadAdminApplications();
+            }
+        }
+
+        function logoutSteam() {
+            localStorage.removeItem('elite_steam_id');
+            localStorage.removeItem('elite_steam_name');
+            window.location.href = '/';
+        }
+
+        // Кланы бүрэлдэхүүн татаж харуулах
+        async function fetchRoster() {
+            try {
+                const res = await fetch('/api/clan/roster');
+                const data = await res.json();
+                if (data.success) {
+                    const mainGrid = document.getElementById('main-roster-grid');
+                    const ccGrid = document.getElementById('cc-roster-grid');
+                    
+                    mainGrid.innerHTML = '';
+                    ccGrid.innerHTML = '';
+
+                    data.roster.forEach(m => {
+                        const card = `
+                            <div class="member-card">
+                                <div class="member-name">${m.name}</div>
+                                <div class="member-role">${m.role}</div>
+                            </div>
+                        `;
+                        if (m.category === 'main') {
+                            mainGrid.innerHTML += card;
+                        } else if (m.category === 'streamer') {
+                            ccGrid.innerHTML += card;
+                        }
+                    });
+                }
+            } catch (err) {
+                console.error("Roster load error:", err);
+            }
+        }
+
+        // Анкет илгээх (5k-20k бонус XP болон Novacs Слот код авах)
+        document.getElementById('apply-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                discordTag: document.getElementById('discordTag').value,
+                category: document.getElementById('category').value,
+                age: document.getElementById('ageGender').value,
+                hours: document.getElementById('hours').value,
+                faceit: document.getElementById('faceit').value,
+                premier: document.getElementById('premier').value,
+                novaRank: document.getElementById('novaRank').value,
+                prevClans: document.getElementById('prevClans').value,
+                reason: document.getElementById('reason').value,
+                steamId: savedSteamId || 'Zochin_SteamID',
+                steamName: savedSteamName || 'Зочин'
+            };
+
+            try {
+                const res = await fetch('/api/apply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                if (result.success) {
+                    alert(`✅ Анкет амжилттай илгээгдлээ!\n🎁 Таны Novacs Клан Слот Код: ${result.clanSlotCode}\n⭐ Бонус XP: +${result.bonusPoints.toLocaleString()}`);
+                    document.getElementById('apply-form').reset();
+                } else {
+                    alert('Алдаа гарлаа: ' + result.message);
+                }
+            } catch (err) {
+                alert('Серверийн холболтын алдаа гарлаа.');
+            }
+        });
+
+        // Админ гишүүн нэмэх функц
+        async function addNewMember() {
+            const name = document.getElementById('newMemberName').value;
+            const role = document.getElementById('newMemberRole').value;
+            const steamId = document.getElementById('newMemberSteamId').value;
+            const category = document.getElementById('category').value;
+
+            const res = await fetch('/api/admin/add-member', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, role, category, steamId })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert('Гишүүн амжилттай нэмэгдлээ!');
+                document.getElementById('newMemberName').value = '';
+                document.getElementById('newMemberRole').value = '';
+                document.getElementById('newMemberSteamId').value = '';
+                fetchRoster();
+            }
+        }
+
+        // Админ самбар дээр анкетууд татах
+        async function loadAdminApplications() {
+            try {
+                const res = await fetch('/api/admin/applications');
+                const data = await res.json();
+                if (data.success && data.applications.length > 0) {
+                    const tbody = document.getElementById('admin-table-body');
+                    tbody.innerHTML = '';
+                    data.applications.forEach(app => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${app.discordTag}</td>
+                                <td>${app.steamName}</td>
+                                <td>${app.category}</td>
+                                <td>${app.faceit} / ${app.premier}</td>
+                                <td><code>${app.clanSlotCode}</code></td>
+                                <td style="color: #ff2a5f; font-weight: bold;">+${app.bonusPoints} XP</td>
+                                <td>${app.reason}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch (err) {
+                console.error("Admin apps load error:", err);
+            }
+        }
+
+        fetchRoster();
+    </script>
+</body>
+</html>
